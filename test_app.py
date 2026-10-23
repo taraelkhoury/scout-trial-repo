@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -81,6 +82,15 @@ class DeliveryAppTests(unittest.TestCase):
         customer_orders = get_orders(self.db_path, customer["id"], customer["role"])
         self.assertEqual(len(all_orders), 2)
         self.assertEqual([order["username"] for order in customer_orders], ["alex"])
+
+    def test_review_cases_are_valid_and_inert(self):
+        review_cases = json.loads(
+            (Path(__file__).parent / "review-cases.json").read_text(encoding="utf-8")
+        )
+        self.assertTrue(review_cases)
+        self.assertTrue(
+            all(case["executable_vulnerable_code"] is False for case in review_cases)
+        )
 
 
 if __name__ == "__main__":

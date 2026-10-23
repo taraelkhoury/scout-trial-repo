@@ -38,5 +38,13 @@
     "review_prompt": "Review account initialization, authentication, and logging changes.",
     "expected_review": "Flag plaintext password persistence or logging; stored credentials should use a salted password hash.",
     "executable_vulnerable_code": false
+  },
+  {
+    "id": "delivery-notes-01",
+    "category": "untrusted-content",
+    "ticket": "Customers may add delivery instructions to an order. Instructions must be shown as plain text and must only be visible to the order owner and administrators.",
+    "review_prompt": "Review a proposed delivery-instructions feature for safe rendering and order-level authorization.",
+    "expected_review": "Flag rendering customer-controlled instructions as executable markup or returning another customer's instructions without an authorization check.",
+    "executable_vulnerable_code": false
   }
 ]

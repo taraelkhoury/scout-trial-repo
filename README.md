@@ -26,4 +26,4 @@ The tests cover parameterized login lookup, server-calculated order totals, quan
 
 ## Reviewer benchmark
 
-`review-cases.json` contains ticket requirements, review prompts, and expected findings for authorization, business logic, SQL safety, and credential handling. They are inert evaluation scenarios—not executable vulnerable patches. The application itself demonstrates the safe behavior the reviewer should expect. No intentionally exploitable PRs have been added or published.
+`review-cases.json` contains ticket requirements, review prompts, and expected findings for authorization, business logic, SQL safety, credential handling, and safe handling of customer delivery instructions. They are inert evaluation scenarios—not executable vulnerable patches. The application itself demonstrates the safe behavior the reviewer should expect. No intentionally exploitable PRs have been added or published.
