@@ -1,0 +1,42 @@
+[
+  {
+    "id": "ticket-requirements-01",
+    "category": "requirements",
+    "ticket": "Customers must not see or modify another customer's orders.",
+    "review_prompt": "Check the proposed change for ownership checks on both order reads and writes.",
+    "expected_review": "Flag any path that lets a customer access or change an order they do not own.",
+    "executable_vulnerable_code": false
+  },
+  {
+    "id": "business-logic-01",
+    "category": "business-logic",
+    "ticket": "Order totals must be computed from current server-side prices and positive quantities.",
+    "review_prompt": "Review changes to order creation and pricing.",
+    "expected_review": "Flag trusting a client-supplied total, accepting non-positive quantities, or calculating totals from stale client data.",
+    "executable_vulnerable_code": false
+  },
+  {
+    "id": "authorization-01",
+    "category": "authorization",
+    "ticket": "Only administrators may change product prices and availability.",
+    "review_prompt": "Review product-management API changes, not just whether the admin controls are hidden in the page.",
+    "expected_review": "Flag missing server-side role checks on product updates.",
+    "executable_vulnerable_code": false
+  },
+  {
+    "id": "sql-safety-01",
+    "category": "injection-safety",
+    "ticket": "Login must compare the supplied username and password without interpreting input as SQL.",
+    "review_prompt": "Review database queries involved in authentication, including unusual usernames.",
+    "expected_review": "Flag SQL assembled from user input instead of parameterized queries; a username containing SQL comment syntax must not change query behavior.",
+    "executable_vulnerable_code": false
+  },
+  {
+    "id": "credential-safety-01",
+    "category": "credential-safety",
+    "ticket": "Passwords must not be stored or logged in plaintext.",
+    "review_prompt": "Review account initialization, authentication, and logging changes.",
+    "expected_review": "Flag plaintext password persistence or logging; stored credentials should use a salted password hash.",
+    "executable_vulnerable_code": false
+  }
+]

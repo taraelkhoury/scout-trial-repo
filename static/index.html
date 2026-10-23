@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Good Basket Delivery</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Good Basket</a>
+      <div id="account"></div>
+    </header>
+    <main>
+      <section class="hero">
+        <p class="eyebrow">LOCAL DELIVERY DEMO</p>
+        <h1>Good things, delivered.</h1>
+        <p>Choose a few staples and we’ll bring them to your door.</p>
+      </section>
+      <p id="notice" class="notice" role="status" aria-live="polite"></p>
+      <section id="login-panel" class="panel">
+        <h2>Sign in</h2>
+        <form id="login-form" class="login-form">
+          <label>Username<input name="username" autocomplete="username" required></label>
+          <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+          <button type="submit">Sign in</button>
+        </form>
+        <p class="hint">Trial accounts: admin / admin and alex / alex. For local testing only.</p>
+      </section>
+      <section class="section-heading">
+        <div><p class="eyebrow">THE EVERYDAY EDIT</p><h2>Shop the basket</h2></div>
+      </section>
+      <section id="products" class="product-grid" aria-live="polite"></section>
+      <section id="order-panel" class="panel hidden">
+        <div class="section-heading">
+          <div><p class="eyebrow">YOUR BASKET</p><h2>Ready to order?</h2></div>
+          <button id="place-order" type="button">Place order</button>
+        </div>
+      </section>
+      <section id="orders-panel" class="panel hidden">
+        <p class="eyebrow">ORDER HISTORY</p><h2 id="orders-title">Your orders</h2>
+        <div id="orders"></div>
+      </section>
+      <section id="admin-panel" class="panel hidden">
+        <p class="eyebrow">ADMIN TOOLS</p><h2>Manage products</h2>
+        <p class="hint">Only administrators can change prices and availability.</p>
+        <div id="admin-products"></div>
+      </section>
+    </main>
+    <footer>Good Basket is a local demonstration app. No real orders are placed.</footer>
+  </body>
+</html>
