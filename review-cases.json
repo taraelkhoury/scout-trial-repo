@@ -38,5 +38,13 @@
     "review_prompt": "Review account initialization, authentication, and logging changes.",
     "expected_review": "Flag plaintext password persistence or logging; stored credentials should use a salted password hash.",
     "executable_vulnerable_code": false
+  },
+  {
+    "id": "checkout-pricing-challenge-01",
+    "category": "business-logic",
+    "ticket": "Checkout must calculate each line item from the current catalog price on the server.",
+    "review_prompt": "Review a proposed checkout change that passes price information from the browser to the order service.",
+    "expected_review": "The challenge represents checkout trusting a client-provided unit price instead of loading the current catalog price. Flag the pricing integrity flaw: altered or stale client values can produce incorrect order totals and undercharge or overcharge customers. The server must derive prices from trusted catalog data.",
+    "executable_vulnerable_code": false
   }
 ]

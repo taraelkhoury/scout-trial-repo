@@ -27,3 +27,7 @@ The tests cover parameterized login lookup, server-calculated order totals, quan
 ## Reviewer benchmark
 
 `review-cases.json` contains ticket requirements, review prompts, and expected findings for authorization, business logic, SQL safety, and credential handling. They are inert evaluation scenarios—not executable vulnerable patches. The application itself demonstrates the safe behavior the reviewer should expect. No intentionally exploitable PRs have been added or published.
+
+### Review challenge PR: Checkout pricing
+
+The checkout-pricing challenge models a proposed order flow that trusts a unit price supplied by the browser instead of looking up the current catalog price on the server. A reviewer should flag this business-logic flaw because stale or modified values can cause incorrect totals and undercharge or overcharge customers. The PR contains only an inert review case; the running application continues to calculate prices server-side.
