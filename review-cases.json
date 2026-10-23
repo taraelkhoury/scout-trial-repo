@@ -38,5 +38,13 @@
     "review_prompt": "Review account initialization, authentication, and logging changes.",
     "expected_review": "Flag plaintext password persistence or logging; stored credentials should use a salted password hash.",
     "executable_vulnerable_code": false
+  },
+  {
+    "id": "order-ownership-challenge-01",
+    "category": "authorization",
+    "ticket": "Customers must only view their own orders; administrators may view all orders.",
+    "review_prompt": "Review a proposed order-detail API change for authorization at the object level.",
+    "expected_review": "The challenge represents an order lookup that checks whether a customer is signed in but fails to verify the requested order belongs to that customer. Flag the missing ownership check; it can expose other customers' names, purchased items, and delivery details. Administrators should retain their intended all-orders access.",
+    "executable_vulnerable_code": false
   }
 ]

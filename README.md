@@ -27,3 +27,7 @@ The tests cover parameterized login lookup, server-calculated order totals, quan
 ## Reviewer benchmark
 
 `review-cases.json` contains ticket requirements, review prompts, and expected findings for authorization, business logic, SQL safety, and credential handling. They are inert evaluation scenarios—not executable vulnerable patches. The application itself demonstrates the safe behavior the reviewer should expect. No intentionally exploitable PRs have been added or published.
+
+### Review challenge PR: Order ownership
+
+The order-ownership challenge models a proposed order-detail endpoint that checks for a signed-in customer but omits the check that the requested order belongs to that customer. A reviewer should flag this object-level authorization failure because it could expose another customer's order and delivery details. The PR contains only an inert review case; it does not add the vulnerable endpoint or expose data.
