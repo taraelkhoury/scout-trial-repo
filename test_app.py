@@ -72,6 +72,24 @@ class DeliveryAppTests(unittest.TestCase):
                 self.db_path, customer["id"], [{"product_id": 1, "quantity": 1}]
             )
 
+    def test_delivery_instructions_are_saved_and_scoped_to_owner_and_admin(self):
+        customer = authenticate(self.db_path, "alex", "alex")
+        admin = authenticate(self.db_path, "admin", "admin")
+        note = "Leave by the side door."
+        order_id = create_order(
+            self.db_path, customer["id"], [{"product_id": 1, "quantity": 1}], note
+        )
+        self.assertEqual(get_orders(self.db_path, customer["id"], "user")[0]["delivery_instructions"], note)
+        self.assertEqual(get_orders(self.db_path, admin["id"], "admin")[0]["id"], order_id)
+        self.assertEqual(get_orders(self.db_path, admin["id"], "user"), [])
+
+    def test_delivery_instructions_validation(self):
+        customer = authenticate(self.db_path, "alex", "alex")
+        for note in (None, 123, "x" * 2001):
+            with self.subTest(note_type=type(note).__name__):
+                with self.assertRaises(ValueError):
+                    create_order(self.db_path, customer["id"], [{"product_id": 1, "quantity": 1}], note)
+
     def test_customers_only_receive_their_own_orders(self):
         admin = authenticate(self.db_path, "admin", self.credentials["admin"])
         customer = authenticate(self.db_path, "alex", self.credentials["alex"])
