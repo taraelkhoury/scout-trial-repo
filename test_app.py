@@ -6,6 +6,7 @@ from app import (
     authenticate,
     create_order,
     get_orders,
+    get_order_by_id,
     initialize_database,
     update_product,
 )
@@ -71,6 +72,15 @@ class DeliveryAppTests(unittest.TestCase):
             create_order(
                 self.db_path, customer["id"], [{"product_id": 1, "quantity": 1}]
             )
+
+    def test_order_details_include_items_and_handle_missing_order(self):
+        customer = authenticate(self.db_path, "alex", "alex")
+        order_id = create_order(self.db_path, customer["id"], [{"product_id": 1, "quantity": 2}])
+        order = get_order_by_id(self.db_path, order_id)
+        self.assertEqual(order["username"], "alex")
+        self.assertEqual(order["total_cents"], 798)
+        self.assertEqual(order["items"][0]["quantity"], 2)
+        self.assertIsNone(get_order_by_id(self.db_path, order_id + 1))
 
     def test_customers_only_receive_their_own_orders(self):
         admin = authenticate(self.db_path, "admin", self.credentials["admin"])
