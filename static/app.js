@@ -198,7 +198,18 @@ async function loadOrders() {
     const details = document.createElement("p");
     details.textContent = `${order.items.map((item) =>
       `${item.quantity} × ${item.name} (${money(item.unit_price_cents)})`).join(", ")}${currentUser.role === "admin" ? ` · Customer: ${order.username}` : ""}`;
-    card.append(title, details);
+    const extra = document.createElement("p");
+    extra.hidden = true;
+    const view = button("View order details", async () => {
+      try {
+        const result = await api(`/api/orders/${order.id}`);
+        extra.textContent = `Placed: ${result.order.created_at} | Customer: ${result.order.username} | ${result.order.items.map((item) => `${item.quantity} x ${item.name}`).join(", ")}`;
+        extra.hidden = false;
+      } catch (error) {
+        showNotice(error.message, true);
+      }
+    }, "secondary");
+    card.append(title, details, view, extra);
     container.append(card);
   }
 }

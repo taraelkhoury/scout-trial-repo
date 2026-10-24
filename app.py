@@ -267,6 +267,32 @@ def get_orders(path, user_id, role):
     return result
 
 
+
+def get_order_by_id(path, order_id):
+    with database_connection(path) as connection:
+        row = connection.execute(
+            """
+            SELECT orders.id, users.username, orders.total_cents, orders.created_at
+            FROM orders JOIN users ON users.id = orders.user_id
+            WHERE orders.id = ?
+            """,
+            (order_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        items = connection.execute(
+            "SELECT product_name, quantity, unit_price_cents FROM order_items WHERE order_id = ? ORDER BY id",
+            (order_id,),
+        ).fetchall()
+    return {
+        "id": row[0], "username": row[1], "total_cents": row[2], "created_at": row[3],
+        "items": [
+            {"name": item[0], "quantity": item[1], "unit_price_cents": item[2]}
+            for item in items
+        ],
+    }
+
+
 def session_for(handler):
     cookie = SimpleCookie()
     cookie.load(handler.headers.get("Cookie", ""))
@@ -345,6 +371,21 @@ class DeliveryHandler(BaseHTTPRequestHandler):
                 self.send_json(200, {"user": None})
             else:
                 self.send_json(200, {"user": user})
+            return
+        if path.startswith("/api/orders/"):
+            if user is None:
+                self.send_json(401, {"error": "Sign in to view orders."})
+                return
+            try:
+                order_id = int(path.rsplit("/", 1)[1])
+            except ValueError:
+                self.send_json(400, {"error": "Invalid order ID."})
+                return
+            order = get_order_by_id(database_path(), order_id)
+            if order is None:
+                self.send_json(404, {"error": "Order not found."})
+                return
+            self.send_json(200, {"order": order})
             return
         if path == "/api/orders":
             if user is None:
