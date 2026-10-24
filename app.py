@@ -23,7 +23,11 @@ STATIC_FILES = {
 SESSION_TTL_SECONDS = 8 * 60 * 60
 PASSWORD_ITERATIONS = 300_000
 MAX_REQUEST_BYTES = 16_384
-DEMO_CREDENTIALS = (("admin", "admin", "admin"), ("alex", "alex", "user"))
+DEMO_CREDENTIALS = (
+    ("admin", "admin", "admin"),
+    ("alex", "alex", "user"),
+    ("sara", "sara", "user"),
+)
 SESSIONS = {}
 SESSIONS_LOCK = threading.Lock()
 

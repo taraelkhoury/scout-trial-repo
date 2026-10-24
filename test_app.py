@@ -22,11 +22,14 @@ class DeliveryAppTests(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_demo_passwords_authenticate_and_sql_like_username_is_rejected(self):
-        self.assertEqual(self.credentials, {"admin": "admin", "alex": "alex"})
+        self.assertEqual(self.credentials, {"admin": "admin", "alex": "alex", "sara": "sara"})
         admin = authenticate(self.db_path, "admin", "admin")
         self.assertEqual(admin["role"], "admin")
         alex = authenticate(self.db_path, "alex", "alex")
         self.assertEqual(alex["role"], "user")
+        sara = authenticate(self.db_path, "sara", "sara")
+        self.assertEqual(sara["role"], "user")
+        self.assertNotEqual(alex["id"], sara["id"])
         self.assertIsNone(authenticate(self.db_path, "admin--", "anything"))
         self.assertIsNone(authenticate(self.db_path, "admin", "wrong"))
 
@@ -34,6 +37,7 @@ class DeliveryAppTests(unittest.TestCase):
         initialize_database(self.db_path)
         self.assertEqual(authenticate(self.db_path, "admin", "admin")["role"], "admin")
         self.assertEqual(authenticate(self.db_path, "alex", "alex")["role"], "user")
+        self.assertEqual(authenticate(self.db_path, "sara", "sara")["role"], "user")
 
     def test_order_total_is_calculated_from_database_prices(self):
         customer = authenticate(self.db_path, "alex", self.credentials["alex"])
