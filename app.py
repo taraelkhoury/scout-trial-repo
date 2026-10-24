@@ -97,6 +97,11 @@ def initialize_database(path, announce=False):
             );
             """
         )
+        columns = {row[1] for row in connection.execute("PRAGMA table_info(orders)")}
+        if "delivery_instructions" not in columns:
+            connection.execute(
+                "ALTER TABLE orders ADD COLUMN delivery_instructions TEXT NOT NULL DEFAULT ''"
+            )
         for username, password, role in DEMO_CREDENTIALS:
             connection.execute(
                 """
@@ -148,7 +153,9 @@ def get_products(path):
     ]
 
 
-def create_order(path, user_id, items):
+def create_order(path, user_id, items, delivery_instructions=""):
+    if not isinstance(delivery_instructions, str) or len(delivery_instructions) > 2000:
+        raise ValueError("Delivery instructions must be text of at most 2000 characters.")
     if not isinstance(items, list) or not items or len(items) > 20:
         raise ValueError("An order must contain between 1 and 20 different items.")
     normalized = []
@@ -181,8 +188,8 @@ def create_order(path, user_id, items):
             total_cents += price_cents * quantity
             order_lines.append((name, quantity, price_cents))
         cursor = connection.execute(
-            "INSERT INTO orders (user_id, total_cents) VALUES (?, ?)",
-            (user_id, total_cents),
+            "INSERT INTO orders (user_id, total_cents, delivery_instructions) VALUES (?, ?, ?)",
+            (user_id, total_cents, delivery_instructions),
         )
         order_id = cursor.lastrowid
         connection.executemany(
@@ -224,7 +231,8 @@ def get_orders(path, user_id, role):
         if role == "admin":
             rows = connection.execute(
                 """
-                SELECT orders.id, users.username, orders.total_cents, orders.created_at
+                SELECT orders.id, users.username, orders.total_cents, orders.created_at,
+                       orders.delivery_instructions
                 FROM orders JOIN users ON users.id = orders.user_id
                 ORDER BY orders.id DESC
                 """
@@ -232,7 +240,8 @@ def get_orders(path, user_id, role):
         else:
             rows = connection.execute(
                 """
-                SELECT orders.id, users.username, orders.total_cents, orders.created_at
+                SELECT orders.id, users.username, orders.total_cents, orders.created_at,
+                       orders.delivery_instructions
                 FROM orders JOIN users ON users.id = orders.user_id
                 WHERE orders.user_id = ?
                 ORDER BY orders.id DESC
@@ -254,6 +263,7 @@ def get_orders(path, user_id, role):
                     "username": row[1],
                     "total_cents": row[2],
                     "created_at": row[3],
+                    "delivery_instructions": row[4],
                     "items": [
                         {
                             "name": item[0],
@@ -409,7 +419,8 @@ class DeliveryHandler(BaseHTTPRequestHandler):
                 if not isinstance(data, dict):
                     raise ValueError("Request body must be an object.")
                 order_id = create_order(
-                    database_path(), user["id"], data.get("items")
+                    database_path(), user["id"], data.get("items"),
+                    data.get("delivery_instructions", "")
                 )
             except ValueError as error:
                 self.send_json(400, {"error": str(error)})

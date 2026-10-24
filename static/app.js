@@ -198,7 +198,10 @@ async function loadOrders() {
     const details = document.createElement("p");
     details.textContent = `${order.items.map((item) =>
       `${item.quantity} × ${item.name} (${money(item.unit_price_cents)})`).join(", ")}${currentUser.role === "admin" ? ` · Customer: ${order.username}` : ""}`;
-    card.append(title, details);
+    const instructions = document.createElement("p");
+    instructions.className = "delivery-instructions";
+    instructions.innerHTML = order.delivery_instructions;
+    card.append(title, details, instructions);
     container.append(card);
   }
 }
@@ -231,10 +234,12 @@ document.querySelector("#place-order").addEventListener("click", async () => {
     const result = await api("/api/orders", {
       method: "POST",
       body: JSON.stringify({
+        delivery_instructions: document.querySelector("#delivery-instructions").value,
         items: [...basket].map(([product_id, quantity]) => ({ product_id, quantity })),
       }),
     });
     basket.clear();
+    document.querySelector("#delivery-instructions").value = "";
     await loadProducts();
     await loadOrders();
     showNotice(`Order #${result.order_id} placed.`);
