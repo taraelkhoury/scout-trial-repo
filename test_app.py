@@ -72,6 +72,24 @@ class DeliveryAppTests(unittest.TestCase):
                 self.db_path, customer["id"], [{"product_id": 1, "quantity": 1}]
             )
 
+    def test_checkout_accepts_catalog_price_snapshot(self):
+        customer = authenticate(self.db_path, "alex", "alex")
+        create_order(self.db_path, customer["id"], [
+            {"product_id": 1, "quantity": 2, "unit_price_cents": 399}
+        ])
+        order = get_orders(self.db_path, customer["id"], "user")[0]
+        self.assertEqual(order["total_cents"], 798)
+        self.assertEqual(order["items"][0]["unit_price_cents"], 399)
+
+    def test_checkout_rejects_invalid_unit_price_values(self):
+        customer = authenticate(self.db_path, "alex", "alex")
+        for price in (0, -1, True, "399", 3.99, 10_000_001):
+            with self.subTest(price=price):
+                with self.assertRaises(ValueError):
+                    create_order(self.db_path, customer["id"], [
+                        {"product_id": 1, "quantity": 1, "unit_price_cents": price}
+                    ])
+
     def test_customers_only_receive_their_own_orders(self):
         admin = authenticate(self.db_path, "admin", self.credentials["admin"])
         customer = authenticate(self.db_path, "alex", self.credentials["alex"])

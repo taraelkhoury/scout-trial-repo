@@ -165,12 +165,17 @@ def create_order(path, user_id, items):
         if not 1 <= quantity <= 20:
             raise ValueError("Each quantity must be between 1 and 20.")
         seen_product_ids.add(product_id)
-        normalized.append((product_id, quantity))
+        unit_price_cents = item.get("unit_price_cents")
+        if unit_price_cents is not None and (
+            type(unit_price_cents) is not int or not 1 <= unit_price_cents <= 10_000_000
+        ):
+            raise ValueError("Unit prices must be positive whole cents up to 10000000.")
+        normalized.append((product_id, quantity, unit_price_cents))
 
     with database_connection(path) as connection:
         order_lines = []
         total_cents = 0
-        for product_id, quantity in normalized:
+        for product_id, quantity, unit_price_cents in normalized:
             product = connection.execute(
                 "SELECT name, price_cents, available FROM products WHERE id = ?",
                 (product_id,),
@@ -178,6 +183,8 @@ def create_order(path, user_id, items):
             if product is None or not product[2]:
                 raise ValueError("A selected product is unavailable.")
             name, price_cents, _ = product
+            if unit_price_cents is not None:
+                price_cents = unit_price_cents
             total_cents += price_cents * quantity
             order_lines.append((name, quantity, price_cents))
         cursor = connection.execute(

@@ -231,7 +231,11 @@ document.querySelector("#place-order").addEventListener("click", async () => {
     const result = await api("/api/orders", {
       method: "POST",
       body: JSON.stringify({
-        items: [...basket].map(([product_id, quantity]) => ({ product_id, quantity })),
+        items: [...basket].map(([product_id, quantity]) => ({
+          product_id,
+          quantity,
+          unit_price_cents: products.find((product) => product.id === product_id).price_cents,
+        })),
       }),
     });
     basket.clear();
